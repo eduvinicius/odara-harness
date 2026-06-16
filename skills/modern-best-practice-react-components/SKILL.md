@@ -96,8 +96,19 @@ components/layout/
 ```
 
 - `index.ts` re-exports the public surface so callers use `import { Footer } from "@/components/layout/Footer"` — they never import from internal files directly
-- `footer.data.ts` holds all static data, types, and configuration owned by this component
+- `component.data.ts` holds static consts and lookup maps owned by this component
+- `component.types.ts` holds TypeScript interfaces and types for the component
 - **NEVER** place two sibling components as loose files in the same directory; each gets its own folder
+
+Full example with all file roles:
+
+```
+SearchField/
+  SearchField.tsx           ← component markup and logic only
+  searchField.types.ts      ← SearchFieldProps interface
+  searchField.data.ts       ← heights lookup map and other consts
+  index.ts                  ← re-exports SearchField
+```
 
 ## Static Data in JSX Props
 
