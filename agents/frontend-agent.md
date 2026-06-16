@@ -38,9 +38,9 @@ odara/
 │   ├── commerce/         ← ProductCard, CartDrawer, CartLine, PriceTag, QuantityStepper
 │   └── layout/           ← Header, Footer
 ├── lib/
-│   ├── firebase.ts       ← Firebase client SDK init (used only in 'use client' components)
-│   ├── firebase-admin.ts ← Firebase Admin SDK init (used only in Server Components)
-│   ├── data.ts           ← Firestore fetch functions + Product interface + CATEGORIES
+│   ├── supabase.ts       ← Supabase browser client init (used only in 'use client' components)
+│   ├── supabase-server.ts ← Supabase server client init (used only in Server Components)
+│   ├── data.ts           ← Supabase fetch functions + Product interface + CATEGORIES
 │   ├── cart.ts           ← Client-side cart state (Context or Zustand)
 │   ├── whatsapp.ts       ← WhatsApp order message builder
 │   └── utils.ts          ← money() formatter and other pure helpers
@@ -50,7 +50,7 @@ odara/
 
 ## Stack
 
-Next.js 16 · React 19 · TypeScript 5 (strict) · Tailwind CSS 4 · App Router (no Pages Router) · Firebase Firestore (read-only)
+Next.js 16 · React 19 · TypeScript 5 (strict) · Tailwind CSS 4 · App Router (no Pages Router) · Supabase (read-only)
 
 > **Next.js 16 warning:** APIs and conventions may differ from training data.
 > Read `node_modules/next/dist/docs/` before writing any Next.js-specific code.
@@ -97,7 +97,7 @@ Header and CartDrawer are rendered in `app/layout.tsx` so they persist across ro
 
 ```typescript
 interface Product {
-  id: string;             // Firestore document ID
+  id: string;             // Supabase row ID
   name: string;           // pt-BR
   category: string | null;
   price: number;
@@ -110,9 +110,9 @@ interface Product {
 const CATEGORIES = ['Todos', 'Aromas', 'Caixas', 'Joias', 'Flores', 'Doces', 'Decoração'];
 ```
 
-Products are fetched from Firestore in `lib/data.ts`. The DS prototype at
+Products are fetched from Supabase in `lib/data.ts`. The DS prototype at
 `../Odara Design System/ui_kits/odara-web/data.js` remains the reference for the data
-shape and sample content, but the live source of truth is Firestore.
+shape and sample content, but the live source of truth is Supabase.
 
 ## Key rules
 
@@ -137,28 +137,24 @@ shape and sample content, but the live source of truth is Firestore.
   Install with `npm install lucide-react` if not present.
 - **No shadcn/ui** — this project uses its own Design System components instead.
 
-## Firebase rules
+## Supabase rules
 
-- **Read-only** — only `getDocs`, `getDoc`, `query`, `collection`, `where`, `orderBy`,
-  and `limit` are permitted. Never call `setDoc`, `addDoc`, `updateDoc`, `deleteDoc`,
-  `writeBatch`, or `runTransaction`. Odara has no write path.
-- **No Firebase Auth** — do not import or initialize `firebase/auth` or
-  `firebase-admin/auth`. There is no authentication.
-- **SDK split by component type**:
-  - **Server Components** → use the Firebase Admin SDK (`firebase-admin`) initialized
-    in `lib/firebase-admin.ts`. Admin credentials (`FIREBASE_PROJECT_ID`,
-    `FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY`) must be server-only env vars —
-    **never** prefixed with `NEXT_PUBLIC_`.
-  - **Client Components** (`'use client'`) → use the Firebase client SDK (`firebase`)
-    initialized in `lib/firebase.ts`. Client config (`NEXT_PUBLIC_FIREBASE_API_KEY`,
-    `NEXT_PUBLIC_FIREBASE_PROJECT_ID`, etc.) is safe to expose via `NEXT_PUBLIC_`
-    because Firestore security rules guard access, not the SDK config.
-- **Initialize once** — `lib/firebase.ts` and `lib/firebase-admin.ts` must each
-  initialize their respective SDK only once (guard with `getApps().length` for the
-  client SDK; use a module-level singleton for Admin).
+- **Read-only** — only `select()` queries are permitted. Never call `insert()`, `update()`,
+  `upsert()`, or `delete()`. Odara has no write path.
+- **No Supabase Auth** — do not import or use `supabase.auth`. There is no authentication.
+- **Client split by component type**:
+  - **Server Components** → use the server client initialized in `lib/supabase-server.ts`
+    with the service role key (`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`). These must
+    be server-only env vars — **never** prefixed with `NEXT_PUBLIC_`.
+  - **Client Components** (`'use client'`) → use the browser client initialized in
+    `lib/supabase.ts` with the anon key (`NEXT_PUBLIC_SUPABASE_URL`,
+    `NEXT_PUBLIC_SUPABASE_ANON_KEY`). These are safe to expose via `NEXT_PUBLIC_`
+    because Supabase Row Level Security guards access.
+- **Initialize once** — `lib/supabase.ts` and `lib/supabase-server.ts` must each export
+  a singleton client. Do not call `createClient` inline inside components or pages.
 - **Prefer Server Components** — fetch product data in `async` Server Components using
-  the Admin SDK. This keeps credentials server-side and eliminates client-side
-  loading states for catalog data.
+  the server client. This keeps the service role key server-side and eliminates
+  client-side loading states for catalog data.
 
 ## Visual conventions
 

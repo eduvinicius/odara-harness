@@ -48,10 +48,9 @@ exactly what is wrong, why it matters, and what the fix should look like.
 - [ ] **No `NEXT_PUBLIC_` secrets** — environment variables with the `NEXT_PUBLIC_`
   prefix are bundled into the client JS and visible to anyone. They must never contain
   API keys, tokens, or private phone numbers. Flag as critical.
-- [ ] **Firebase Admin credentials not exposed** — `FIREBASE_CLIENT_EMAIL` and
-  `FIREBASE_PRIVATE_KEY` must be server-only env vars (no `NEXT_PUBLIC_` prefix).
-  If either appears in client-side code or as a `NEXT_PUBLIC_` var, it is a critical
-  credential leak.
+- [ ] **Supabase service role key not exposed** — `SUPABASE_SERVICE_ROLE_KEY` must be a
+  server-only env var (no `NEXT_PUBLIC_` prefix). If it appears in client-side code or
+  as a `NEXT_PUBLIC_` var, it is a critical credential leak.
 - [ ] **Server Component data exposure** — Server Components can access server-only
   resources. Verify that no sensitive data (file paths, env vars not intended for the
   client) is passed as props to Client Components or rendered directly in HTML.
@@ -61,40 +60,39 @@ exactly what is wrong, why it matters, and what the fix should look like.
 
 ---
 
-## Firebase Checklist
+## Supabase Checklist
 
 ### 🔴 Write operations are forbidden
 
-- [ ] **No Firestore writes** — `setDoc`, `addDoc`, `updateDoc`, `deleteDoc`,
-  `writeBatch`, and `runTransaction` must never appear anywhere in the codebase. Odara
-  is a read-only catalog; any write call is a critical violation.
-- [ ] **No Firebase Auth** — `firebase/auth` and `firebase-admin/auth` must not be
-  imported. There is no authentication. Flag any occurrence as critical.
+- [ ] **No Supabase writes** — `insert()`, `update()`, `upsert()`, and `delete()` must
+  never appear anywhere in the codebase. Odara is a read-only catalog; any write call
+  is a critical violation.
+- [ ] **No Supabase Auth** — `supabase.auth` must not be used. There is no
+  authentication. Flag any occurrence as critical.
 
 ### 🟠 SDK usage violations
 
-- [ ] **Admin SDK in Client Components** — `firebase-admin` must only be imported in
-  Server Components or server-side utility files (`lib/firebase-admin.ts`). If it
-  appears in a `'use client'` file, it will crash at runtime.
-- [ ] **Client SDK in Server Components** — the `firebase` client SDK may be used in
-  Client Components only. Using it in a Server Component is not wrong per se, but it
-  forces unnecessary client-side bundle weight; flag as major and suggest Admin SDK.
-- [ ] **Multiple SDK initializations** — `lib/firebase.ts` must guard initialization
-  with `getApps().length === 0`. `lib/firebase-admin.ts` must use a module-level
-  singleton. Duplicate `initializeApp()` calls cause runtime errors.
-- [ ] **Firebase imported outside `lib/`** — Firebase SDK imports (`firebase/*`,
-  `firebase-admin/*`) must only appear in `lib/firebase.ts`, `lib/firebase-admin.ts`,
-  and `lib/data.ts`. Direct SDK usage inside components or pages bypasses the
-  centralized init and is a major violation.
+- [ ] **Server client in Client Components** — `lib/supabase-server.ts` (initialized with
+  the service role key) must only be imported in Server Components or server-side utility
+  files. If it appears in a `'use client'` file, the service role key leaks to the client.
+- [ ] **Browser client in Server Components** — `lib/supabase.ts` (browser client) should
+  not be used in Server Components; use the server client instead to keep the service role
+  key server-side. Flag as major.
+- [ ] **Multiple client instantiations** — `lib/supabase.ts` and `lib/supabase-server.ts`
+  must each export a singleton. Calling `createClient` inline inside components or pages
+  creates a new connection per render; flag as major.
+- [ ] **Supabase imported outside `lib/`** — Supabase client imports must only appear in
+  `lib/supabase.ts`, `lib/supabase-server.ts`, and `lib/data.ts`. Direct SDK usage
+  inside components or pages bypasses the centralized init and is a major violation.
 
 ### 🟡 Conventions
 
-- [ ] **Hardcoded collection names** — Firestore collection names (e.g. `'products'`)
-  must not be scattered across multiple files. They should be defined as constants in
-  `lib/data.ts` and referenced from there.
-- [ ] **Missing error handling on Firestore calls** — `getDocs` and `getDoc` can throw
-  if the network is unavailable or Firestore rules reject the read. Server Component
-  fetches should be wrapped in try/catch; Client Components should handle error state.
+- [ ] **Hardcoded table names** — Supabase table names (e.g. `'products'`) must not be
+  scattered across multiple files. They should be defined as constants in `lib/data.ts`
+  and referenced from there.
+- [ ] **Missing error handling on Supabase calls** — Supabase queries return `{ data, error }`.
+  Server Component fetches should check `error` and throw or handle it; Client Components
+  should surface an error state to the user.
 
 ---
 
@@ -217,10 +215,10 @@ exactly what is wrong, why it matters, and what the fix should look like.
 - **Linting / formatting** — that is ESLint's job.
 - **Tests** — no test runner is configured; do not comment on missing tests.
 - **Backend** — Odara has no custom backend. If you see an `app/api/` route handler
-  that isn't a Firebase-related server utility, flag it as unexpected and ask the user
+  that isn't a Supabase-related server utility, flag it as unexpected and ask the user
   whether it was intentional.
 - **Authentication or payment** — Odara has neither; any code implying these (outside
-  of Firebase config) is likely a mistake worth flagging.
+  of Supabase config) is likely a mistake worth flagging.
 
 ---
 
@@ -232,7 +230,7 @@ exactly what is wrong, why it matters, and what the fix should look like.
 ### Security
 {findings or "No issues found."}
 
-### Firebase
+### Supabase
 {findings or "No issues found."}
 
 ### Next.js App Router

@@ -23,8 +23,8 @@ delegate.
 
 ## Project Overview
 
-- **App**: Next.js 16 App Router · React 19 · TypeScript 5 · Tailwind CSS 4 · Firebase Firestore (read-only)
-- **No custom backend**: product data comes from Firebase Firestore (GET only — no writes,
+- **App**: Next.js 16 App Router · React 19 · TypeScript 5 · Tailwind CSS 4 · Supabase (read-only)
+- **No custom backend**: product data comes from Supabase (GET only — no writes,
   no auth). Cart is ephemeral client-side state; the order flow ends with a WhatsApp message.
 - **App directory**: `odara/`
 - **Design System** (read-only reference): `../Odara Design System/`
@@ -140,8 +140,8 @@ the team has not used it before in this project:
 - A new npm package not in `odara/package.json`
 - A Next.js 16 API that hasn't been used in `odara/app/` yet
   (e.g. Server Actions, `generateStaticParams`, `notFound()`, streaming with Suspense)
-- A Firebase SDK feature not yet used in `odara/lib/`
-  (e.g. `query` with `where`/`orderBy`/`limit`, real-time listeners, `getDoc` vs `getDocs`)
+- A Supabase SDK feature not yet used in `odara/lib/`
+  (e.g. `select()` with filters/ordering/pagination, real-time subscriptions, RPC calls)
 - A browser API (Intersection Observer, Web Share API, Clipboard, etc.)
 - The WhatsApp URL scheme (`wa.me` links, message pre-filling)
 - Any CSS feature outside Tailwind and the Design System tokens

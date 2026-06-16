@@ -29,15 +29,15 @@ modify any existing file in the repo. Your only output is a research summary doc
 - **Stack**: Next.js 16 App Router · React 19 · TypeScript 5 · Tailwind CSS 4
 - **No custom backend**: no custom API routes, no authentication, no payment provider.
   Do not research these topics even if asked — redirect the user.
-- **Firebase Firestore** is the data source. It is read-only (GET only — no writes, no
-  auth). Research Firebase and Firestore SDK topics freely; they are legitimate and
-  expected. Focus on: `firebase` client SDK, `firebase-admin` Admin SDK, Firestore
-  queries (`getDocs`, `getDoc`, `query`, `where`, `orderBy`, `limit`), and the
-  difference between using each SDK in Server vs. Client Components.
+- **Supabase** is the data source. It is read-only (GET only — no writes, no auth).
+  Research Supabase SDK topics freely; they are legitimate and expected. Focus on:
+  `@supabase/supabase-js` client, `@supabase/ssr` for Next.js App Router, Supabase
+  queries (`select()`, filters, ordering, pagination), and the difference between
+  the browser client and server client in Server vs. Client Components.
 - **Design System** at `../Odara Design System/` — read local component and token files
   before fetching external docs when the topic overlaps with the DS.
 - **Common research needs**: Next.js 16 APIs (`next/image`, `next/font`, `next/navigation`,
-  Server Actions, Suspense/Streaming), Firebase/Firestore SDK patterns, Tailwind CSS v4
+  Server Actions, Suspense/Streaming), Supabase SDK patterns, Tailwind CSS v4
   utilities, Lucide React icon usage, WhatsApp URL scheme (`wa.me` links), browser APIs
   relevant to cart or UI behavior, and any npm package referenced in a spec.
 
@@ -105,8 +105,8 @@ stack. Focus on the patterns the spec will actually need — not exhaustive API 
 - Do not execute code or run terminal commands.
 - Do not research auth, custom backend, or payment topics — Odara has none of these.
   If a spec references them, flag the contradiction to the user instead of researching.
-- Firebase/Firestore **is** a legitimate research topic — do not block it. Focus only
-  on read-side patterns (`getDocs`, `getDoc`, `query`) and SDK setup/initialization.
+- Supabase **is** a legitimate research topic — do not block it. Focus only on
+  read-side patterns (`select()`, filters, ordering) and SDK setup/initialization.
 - If given both a spec and a library name, produce one summary file per distinct topic —
   not one combined file.
 - Prefer local Next.js docs in `node_modules/next/dist/docs/` over the web when the
