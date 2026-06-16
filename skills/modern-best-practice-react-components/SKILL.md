@@ -83,6 +83,69 @@ clarity, correctness, and maintainability.
 - **AVOID** unnecessary memoization (`memo`, `useCallback`) unless absolutely required
 - Keep keys stable and meaningful when rendering lists
 
+## File & Folder Structure
+
+Every non-trivial component lives in its **own folder**, not a loose file:
+
+```
+components/layout/
+  Footer/
+    Footer.tsx      ← component markup only
+    footer.data.ts  ← exported consts + shared types
+    index.ts        ← re-exports Footer (and any public API)
+```
+
+- `index.ts` re-exports the public surface so callers use `import { Footer } from "@/components/layout/Footer"` — they never import from internal files directly
+- `footer.data.ts` holds all static data, types, and configuration owned by this component
+- **NEVER** place two sibling components as loose files in the same directory; each gets its own folder
+
+## Static Data in JSX Props
+
+**AVOID** inline array or object literals inside JSX props:
+
+```tsx
+// BAD — creates a new reference every render; hard to maintain
+<FooterCol
+  items={[
+    { label: "Início", href: "/" },
+    { label: "Catálogo", href: "/catalog" },
+  ]}
+/>
+```
+
+**PREFER** a named `const` exported from the component's `.data.ts` file:
+
+```tsx
+// footer.data.ts
+export const FOOTER_NAV_ITEMS: FooterColItem[] = [
+  { label: "Início",   href: "/" },
+  { label: "Catálogo", href: "/catalog" },
+];
+
+// Footer.tsx
+import { FOOTER_NAV_ITEMS } from "./footer.data";
+<FooterCol items={FOOTER_NAV_ITEMS} />
+```
+
+This applies to **any** prop receiving an array or object literal — not just `items`.
+
+## One Exported Component Per File
+
+Each `.tsx` file **MUST** export exactly one component (the one that returns JSX as the public API of that file).
+
+- If a file contains a private sub-component (e.g. `FooterCol` used only inside `Footer`), extract it to its own file inside the same folder:
+
+```
+Footer/
+  Footer.tsx      ← exports Footer (public)
+  FooterCol.tsx   ← exports FooterCol (internal, not re-exported from index.ts)
+  footer.data.ts
+  index.ts
+```
+
+- Private sub-components are **not** re-exported from `index.ts`
+- This rule makes it trivial to find, test, and refactor any component in isolation
+
 ## General Principles
 
 - Write code for humans first, compilers second
