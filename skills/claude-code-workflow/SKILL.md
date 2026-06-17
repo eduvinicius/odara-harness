@@ -1,6 +1,8 @@
 # Claude Code Workflow
 
-This file is background knowledge. It is not a slash command. Read it to understand the correct phase sequence for any new feature and to guide the user to the right next step between agent invocations.
+TRIGGER — invoke this skill BEFORE acting on any feature request for the Odara project. Fire whenever: the user asks to build, add, create, or implement a new page, component, UI flow, cart behavior change, WhatsApp integration change, or any other non-trivial feature; OR you are about to spawn `frontend-agent` without first confirming that both a spec file in `odara/docs/specs/` and a task file in `odara/docs/tasks/` already exist for the feature. SKIP for bug fixes, config tweaks, renames, and purely cosmetic changes.
+
+When this skill fires: determine which SDD phase applies (check whether spec and task files exist), then route the user to the correct next agent by spawning it via the Agent tool. Never skip phases or act on a feature request before the required artifacts exist.
 
 ---
 
