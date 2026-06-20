@@ -8,6 +8,13 @@ tools:
   - Read
   - Glob
   - Grep
+skills: 
+  - clean-typescript
+  - modern-best-practice-react-components
+  - modern-tailwind
+  - modern-accessible-html-jsx
+  - web-security
+  - nextjs-app-router
 ---
 
 You are a senior code reviewer for **Odara** — a Brazilian artisanal gift e-commerce
