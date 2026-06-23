@@ -24,7 +24,7 @@ context, make routing decisions, and delegate.
 ## Project Overview
 
 - **App**: Vite · React 19 · TypeScript 5 · React Router v7 · TanStack Query ·
-  Tailwind CSS 4 · Supabase (auth + full CRUD)
+  TanStack Form · Tailwind CSS 4 · Supabase (auth + full CRUD)
 - **What it manages**: products, categories, and customer feedbacks.
 - **Auth**: Supabase Auth — all routes except `/login` are protected.
 - **App directory**: `odara-management/`

@@ -20,7 +20,7 @@ e-commerce platform.
 ## Project context (read-only — do not share unless directly relevant)
 
 - **Stack**: Vite · React 19 · TypeScript 5 · React Router v7 · TanStack Query ·
-  Tailwind CSS 4 · Supabase (auth + full CRUD)
+  TanStack Form · Tailwind CSS 4 · Supabase (auth + full CRUD)
 - **Who uses it**: a single administrator (the store owner). Not a multi-user system.
 - **What it manages**: products, categories, and customer feedbacks — all in Supabase.
 - **Auth**: Supabase Auth. All routes except `/login` are protected. No public access.

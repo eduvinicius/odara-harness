@@ -62,7 +62,7 @@ odara-management/
 ## Stack
 
 Vite · React 19 · TypeScript 5 (strict) · React Router v7 · TanStack Query ·
-Tailwind CSS 4 · Supabase (auth + full CRUD)
+TanStack Form · Tailwind CSS 4 · Supabase (auth + full CRUD)
 
 ## Commands (always run from `odara-management/`)
 
@@ -141,6 +141,32 @@ When porting a component, adapt the `.jsx` from the Design System into a `.tsx` 
   when `isError` is true.
 - **No redundant `useEffect`**: never fetch data in `useEffect`. Use `useQuery`.
 
+## TanStack Form rules
+
+- **`useForm` for all forms**: every create and edit form must use `useForm` from
+  `@tanstack/react-form`. Never manage form state with individual `useState` hooks per
+  field.
+- **`form.Field` for every input**: every controlled input must be wrapped in
+  `<form.Field name="…">` using its render-prop callback. Never read or write field
+  values outside a `Field` callback.
+- **Validators on the field**: field-level validation goes in the `validators` prop of
+  `<form.Field>` — `{ onChange, onBlur }`. Return a string to signal an error, or
+  `undefined` for valid. Do not validate manually in `onSubmit`.
+- **Display errors from `field.state.meta.errors`**: render the first error below the
+  input when `field.state.meta.isTouched` is true. Never introduce custom error state
+  with `useState`.
+- **`form.handleSubmit` for submission**: wire
+  `<form onSubmit={(e) => { e.preventDefault(); form.handleSubmit() }}>`. The `onSubmit`
+  callback receives `{ value }` — pass it to a mutation from `lib/mutations/`. Never
+  call the Supabase SDK directly inside `onSubmit`.
+- **Guard the submit button**: disable it while `form.state.isSubmitting` is true.
+  Also disable (or show a visual hint) when `!form.state.canSubmit`.
+- **Seed edit forms from `useQuery`**: for edit pages, wait for the query to resolve
+  before initializing `useForm`. Pass the fetched entity as `defaultValues`. Render a
+  skeleton while `isLoading` is true — never render the form with empty defaults.
+- **No `any` in form types**: TypeScript infers field types from `defaultValues`.
+  Always type `defaultValues` explicitly; never cast to `any`.
+
 ## React Router v7 rules
 
 - **`createBrowserRouter`** in `App.tsx`. Never use the legacy `<BrowserRouter>` wrapper.
@@ -171,3 +197,4 @@ When porting a component, adapt the `.jsx` from the Design System into a `.tsx` 
 | Any Supabase usage (client, auth, RLS, queries) | `.claude/skills/supabase/SKILL.md` |
 | React Router v7, protected routes, Vite env vars | `.claude/skills/react-spa/SKILL.md` |
 | Any Design System component, token, or CSS variable | `../Odara Design System/SKILL.md` |
+| TanStack Form (`useForm`, `form.Field`, validators) | review `## TanStack Form rules` above |
